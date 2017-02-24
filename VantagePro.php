@@ -79,6 +79,15 @@ class VantagePro {
 
 
 	function ConvertLOOPData($ret) {
+
+
+$fw=fopen(dirname(__FILE__)."/LOOP.txt","a");
+if ($fw) {
+	fwrite($fw,date("Y-m-d H:i:s")."\t".json_encode($ret)."\n");
+	fclose($fw);
+	}
+
+
 		// Current Barometer. Units are (in Hg / 1000). The barometric
 		// value should be between 20 inches and 32.5 inches in Vantage
 		// Pro and between 20 inches and 32.5 inches in both Vantatge Pro
@@ -107,10 +116,10 @@ class VantagePro {
 		// because it lost synchronization with the radio or due to some
 		// other reason, the wind speed is forced to be 0.
 		if ($ret["WindSpeed"]==255) $ret["WindSpeed"]=null;
-		else $ret["WindSpeed"]=$ret["WindSpeed"] * 0.44704; // Результат в м/с
+		else $ret["WindSpeed"]=$this->temperatureRound($ret["WindSpeed"] * 0.44704); // Результат в м/с
 
 		if ($ret["WindSpeed10MinutesAvg"]==255) $ret["WindSpeed10MinutesAvg"]=null;
-		else $ret["WindSpeed10MinutesAvg"]=$ret["WindSpeed10MinutesAvg"] * 0.44704; // Результат в м/с
+		else $ret["WindSpeed10MinutesAvg"]=$this->temperatureRound($ret["WindSpeed10MinutesAvg"] * 0.44704); // Результат в м/с
 
 		// It is a two byte unsigned value from 1 to 360 degrees. (0° is no
 		// wind data, 90° is East, 180° is South, 270° is West and 360° is
@@ -145,15 +154,20 @@ class VantagePro {
 
 		// Bit 15 to bit 12 is the month, bit 11 to bit 7 is the day and bit 6 to
 		// bit 0 is the year offseted by 2000.
+		if ($ret["StartDateofcurrentStorm"]==65535) $ret["StartDateofcurrentStorm"]=null;
+		else $ret["StartDateofcurrentStorm"]=(($ret["StartDateofcurrentStorm"]&0x3F)+2000)."-".sprintf("%02d", (($ret["StartDateofcurrentStorm"]>>12)&0x1F) )."-".sprintf("%02d", ((($ret["StartDateofcurrentStorm"]>>7)&0x0F)) );
 
-		$ret["StartDateofcurrentStorm"]=(($ret["StartDateofcurrentStorm"]&0x3F)+2000)."-".sprintf("%02d", (($ret["StartDateofcurrentStorm"]>>12)&0x1F) )."-".sprintf("%02d", ((($ret["StartDateofcurrentStorm"]>>7)&0x0F)) );
+		$ret["DayET"]=$this->temperatureRound(($ret["DayET"]/1000)/0.0394); // Результат в мм 0.3
+		$ret["MonthET"]=$this->temperatureRound(($ret["MonthET"]/100)/0.0394); // Результат в мм  7.4
+		$ret["YearET"]=$this->temperatureRound(($ret["YearET"]/100)/0.0394); // Результат в мм
 
-		$ret["DayET"]=($ret["DayET"]/1000)/0.0394; // Результат в мм 0.3
-		$ret["MonthET"]=($ret["MonthET"]/100)/0.0394; // Результат в мм  7.4
-		$ret["YearET"]=($ret["YearET"]/100)/0.0394; // Результат в мм
+		if ($ret["SolarRadiation"]<0 || $ret["SolarRadiation"]==65535) $ret["SolarRadiation"]=null;
 
 		$ret["TimeofSunrise"]=substr($ret["TimeofSunrise"],0,2).":".substr($ret["TimeofSunrise"],2,2);
 		$ret["TimeofSunset"]=substr($ret["TimeofSunset"],0,2).":".substr($ret["TimeofSunset"],2,2);
+
+		// Undocumented ?
+		$ret["UV"]=$ret["UV"]/10;
 
 		// Voltage = ((Data * 300)/512)/100.0
 		$ret["ConsoleBatteryVoltage"]=(($ret["ConsoleBatteryVoltage"] * 300)/512)/100;
@@ -162,6 +176,14 @@ class VantagePro {
 		}
 
 	function ConvertLOOP2Data($ret) {
+
+$fw=fopen(dirname(__FILE__)."/LOOP2.txt","a");
+if ($fw) {
+	fwrite($fw,date("Y-m-d H:i:s")."\t".json_encode($ret)."\n");
+	fclose($fw);
+	}
+
+
 		// Current Barometer. Units are (in Hg / 1000). The barometric
 		// value should be between 20 inches and 32.5 inches in Vantage
 		// Pro and between 20 inches and 32.5 inches in both Vantatge Pro
@@ -230,14 +252,20 @@ class VantagePro {
 		// Bit 15 to bit 12 is the month, bit 11 to bit 7 is the day and bit 6 to
 		// bit 0 is the year offseted by 2000.
     
-		$ret["StartDateofcurrentStorm"]=(($ret["StartDateofcurrentStorm"]&0x3F)+2000)."-".sprintf("%02d", (($ret["StartDateofcurrentStorm"]>>12)&0x1F) )."-".sprintf("%02d", ((($ret["StartDateofcurrentStorm"]>>7)&0x0F)) );
+		if ($ret["StartDateofcurrentStorm"]==65535) $ret["StartDateofcurrentStorm"]=null;
+		else $ret["StartDateofcurrentStorm"]=(($ret["StartDateofcurrentStorm"]&0x3F)+2000)."-".sprintf("%02d", (($ret["StartDateofcurrentStorm"]>>12)&0x1F) )."-".sprintf("%02d", ((($ret["StartDateofcurrentStorm"]>>7)&0x0F)) );
     
 		$ret["DailyET"]=($ret["DailyET"]/1000)/0.0394; // Результат в мм 0.3
+
+		if ($ret["SolarRadiation"]<0 || $ret["SolarRadiation"]==65535) $ret["SolarRadiation"]=null;
     
 		if ($ret["UserEnteredBarometricOffset"]!=-1) $ret["UserEnteredBarometricOffset"]=($ret["UserEnteredBarometricOffset"]/1000)/0.0394; // Результат в мм 0.3
 		if ($ret["BarometricCalibrationNumber"]!=-1) $ret["BarometricCalibrationNumber"]=($ret["BarometricCalibrationNumber"]/1000)/0.0394; // Результат в мм 0.3
 		if ($ret["AbsoluteBarometricPressure"]!=-1) $ret["AbsoluteBarometricPressure"]=($ret["AbsoluteBarometricPressure"]/1000)/0.0394; // Результат в мм 0.3
 		if ($ret["AltimeterSetting"]!=-1) $ret["AltimeterSetting"]=($ret["AltimeterSetting"]/1000)/0.0394; // Результат в мм 0.3
+
+		// Undocumented ?
+		$ret["UV"]=$ret["UV"]/10;
 
 		return $ret;
 		}
