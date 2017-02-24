@@ -10,7 +10,7 @@ class VantagePro {
 	private $CalbackLOOP="";
 	private $CalbackLOOP2="";
 
-	private $crc_table=array(
+	private $crc_table= array(
 		 0x0, 0x1021, 0x2042, 0x3063, 0x4084, 0x50a5, 0x60c6, 0x70e7,
 		0x8108, 0x9129, 0xa14a, 0xb16b, 0xc18c, 0xd1ad, 0xe1ce, 0xf1ef,
 		0x1231, 0x210, 0x3273, 0x2252, 0x52b5, 0x4294, 0x72f7, 0x62d6,
@@ -43,74 +43,308 @@ class VantagePro {
 		0x7c26, 0x6c07, 0x5c64, 0x4c45, 0x3ca2, 0x2c83, 0x1ce0, 0xcc1,
 		0xef1f, 0xff3e, 0xcf5d, 0xdf7c, 0xaf9b, 0xbfba, 0x8fd9, 0x9ff8,
 		0x6e17, 0x7e36, 0x4e55, 0x5e74, 0x2e93, 0x3eb2, 0xed1, 0x1ef0,
-		);
+    );
 
-	function __construct($ip,$port) {
+    private $FORECAST12=array(
+        0 => "Mostly clear and cooler.",
+        1 => "Mostly clear with little temperature change.",
+        2 => "Mostly clear for 12 hours with little temperature change.",
+        3 => "Mostly clear for 12 to 24 hours and cooler.",
+        4 => "Mostly clear with little temperature change.",
+        5 => "Partly cloudy and cooler.",
+        6 => "Partly cloudy with little temperature change.",
+        7 => "Partly cloudy with little temperature change.",
+        8 => "Mostly clear and warmer.",
+        9 => "Partly cloudy with little temperature change.",
+        10 => "Partly cloudy with little temperature change.",
+        11 => "Mostly clear with little temperature change.",
+        12 => "Increasing clouds and warmer. Precipitation possible within 24 to 48 hours.",
+        13 => "Partly cloudy with little temperature change.",
+        14 => "Mostly clear with little temperature change.",
+        15 => "Increasing clouds with little temperature change. Precipitation possible within 24 hours.",
+        16 => "Mostly clear with little temperature change.",
+        17 => "Partly cloudy with little temperature change.",
+        18 => "Mostly clear with little temperature change.",
+        19 => "Increasing clouds with little temperature change. Precipitation possible within 12 hours.",
+        20 => "Mostly clear with little temperature change.",
+        21 => "Partly cloudy with little temperature change.",
+        22 => "Mostly clear with little temperature change.",
+        23 => "Increasing clouds and warmer. Precipitation possible within 24 hours.",
+        24 => "Mostly clear and warmer. Increasing winds.",
+        25 => "Partly cloudy with little temperature change.",
+        26 => "Mostly clear with little temperature change.",
+        27 => "Increasing clouds and warmer. Precipitation possible within 12 hours. Increasing winds.",
+        28 => "Mostly clear and warmer. Increasing winds.",
+        29 => "Increasing clouds and warmer.",
+        30 => "Partly cloudy with little temperature change.",
+        31 => "Mostly clear with little temperature change.",
+        32 => "Increasing clouds and warmer. Precipitation possible within 12 hours. Increasing winds.",
+        33 => "Mostly clear and warmer. Increasing winds.",
+        34 => "Increasing clouds and warmer.",
+        35 => "Partly cloudy with little temperature change.",
+        36 => "Mostly clear with little temperature change.",
+        37 => "Increasing clouds and warmer. Precipitation possible within 12 hours. Increasing winds.",
+        38 => "Partly cloudy with little temperature change.",
+        39 => "Mostly clear with little temperature change.",
+        40 => "Mostly clear and warmer. Precipitation possible within 48 hours.",
+        41 => "Mostly clear and warmer.",
+        42 => "Partly cloudy with little temperature change.",
+        43 => "Mostly clear with little temperature change.",
+        44 => "Increasing clouds with little temperature change. Precipitation possible within 24 to 48 hours.",
+        45 => "Increasing clouds with little temperature change.",
+        46 => "Partly cloudy with little temperature change.",
+        47 => "Mostly clear with little temperature change.",
+        48 => "Increasing clouds and warmer. Precipitation possible within 12 to 24 hours.",
+        49 => "Partly cloudy with little temperature change.",
+        50 => "Mostly clear with little temperature change.",
+        51 => "Increasing clouds and warmer. Precipitation possible within 12 to 24 hours. Windy.",
+        52 => "Partly cloudy with little temperature change.",
+        53 => "Mostly clear with little temperature change.",
+        54 => "Increasing clouds and warmer. Precipitation possible within 12 to 24 hours. Windy.",
+        55 => "Partly cloudy with little temperature change.",
+        56 => "Mostly clear with little temperature change.",
+        57 => "Increasing clouds and warmer. Precipitation possible within 6 to 12 hours.",
+        58 => "Partly cloudy with little temperature change.",
+        59 => "Mostly clear with little temperature change.",
+        60 => "Increasing clouds and warmer. Precipitation possible within 6 to 12 hours. Windy.",
+        61 => "Partly cloudy with little temperature change.",
+        62 => "Mostly clear with little temperature change.",
+        63 => "Increasing clouds and warmer. Precipitation possible within 12 to 24 hours. Windy.",
+        64 => "Partly cloudy with little temperature change.",
+        65 => "Mostly clear with little temperature change.",
+        66 => "Increasing clouds and warmer. Precipitation possible within 12 hours.",
+        67 => "Partly cloudy with little temperature change.",
+        68 => "Mostly clear with little temperature change.",
+        69 => "Increasing clouds and warmer. Precipitation likley.",
+        70 => "Clearing and cooler. Precipitation ending within 6 hours.",
+        71 => "Partly cloudy with little temperature change.",
+        72 => "Clearing and cooler. Precipitation ending within 6 hours.",
+        73 => "Mostly clear with little temperature change.",
+        74 => "Clearing and cooler. Precipitation ending within 6 hours.",
+        75 => "Partly cloudy and cooler.",
+        76 => "Partly cloudy with little temperature change.",
+        77 => "Mostly clear and cooler.",
+        78 => "Clearing and cooler. Precipitation ending within 6 hours.",
+        79 => "Mostly clear with little temperature change.",
+        80 => "Clearing and cooler. Precipitation ending within 6 hours.",
+        81 => "Mostly clear and cooler.",
+        82 => "Partly cloudy with little temperature change.",
+        83 => "Mostly clear with little temperature change.",
+        84 => "Increasing clouds with little temperature change. Precipitation possible within 24 hours.",
+        85 => "Mostly cloudy and cooler. Precipitation continuing.",
+        86 => "Partly cloudy with little temperature change.",
+        87 => "Mostly clear with little temperature change.",
+        88 => "Mostly cloudy and cooler. Precipitation likely.",
+        89 => "Mostly cloudy with little temperature change. Precipitation continuing.",
+        90 => "Mostly cloudy with little temperature change. Precipitation likely.",
+        91 => "Partly cloudy with little temperature change.",
+        92 => "Mostly clear with little temperature change.",
+        93 => "Increasing clouds and cooler. Precipitation possible and windy within 6 hours.",
+        94 => "Increasing clouds with little temperature change. Precipitation possible and windy within 6 hours.",
+        95 => "Mostly cloudy and cooler. Precipitation continuing. Increasing winds.",
+        96 => "Partly cloudy with little temperature change.",
+        97 => "Mostly clear with little temperature change.",
+        98 => "Mostly cloudy and cooler. Precipitation likely. Increasing winds.",
+        99 => "Mostly cloudy with little temperature change. Precipitation continuing. Increasing winds.",
+        100 => "Mostly cloudy with little temperature change. Precipitation likely. Increasing winds.",
+        101 => "Partly cloudy with little temperature change.",
+        102 => "Mostly clear with little temperature change.",
+        103 => "Increasing clouds and cooler. Precipitation possible within 12 to 24 hours possible wind shift to the W, NW, or N.",
+        104 => "Increasing clouds with little temperature change. Precipitation possible within 12 to 24 hours possible wind shift to the W, NW, or N.",
+        105 => "Partly cloudy with little temperature change.",
+        106 => "Mostly clear with little temperature change.",
+        107 => "Increasing clouds and cooler. Precipitation possible within 6 hours possible wind shift to the W, NW, or N.",
+        108 => "Increasing clouds with little temperature change. Precipitation possible within 6 hours possible wind shift to the W, NW, or N.",
+        109 => "Mostly cloudy and cooler. Precipitation ending within 12 hours possible wind shift to the W, NW, or N.",
+        110 => "Mostly cloudy and cooler. Possible wind shift to the W, NW, or N.",
+        111 => "Mostly cloudy with little temperature change. Precipitation ending within 12 hours possible wind shift to the W, NW, or N.",
+        112 => "Mostly cloudy with little temperature change. Possible wind shift to the W, NW, or N.",
+        113 => "Mostly cloudy and cooler. Precipitation ending within 12 hours possible wind shift to the W, NW, or N.",
+        114 => "Partly cloudy with little temperature change.",
+        115 => "Mostly clear with little temperature change.",
+        116 => "Mostly cloudy and cooler. Precipitation possible within 24 hours possible wind shift to the W, NW, or N.",
+        117 => "Mostly cloudy with little temperature change. Precipitation ending within 12 hours possible wind shift to the W, NW, or N.",
+        118 => "Mostly cloudy with little temperature change. Precipitation possible within 24 hours possible wind shift to the W, NW, or N.",
+        119 => "Clearing, cooler and windy. Precipitation ending within 6 hours.",
+        120 => "Clearing, cooler and windy.",
+        121 => "Mostly cloudy and cooler. Precipitation ending within 6 hours. Windy with possible wind shift to the W, NW, or N.",
+        122 => "Mostly cloudy and cooler. Windy with possible wind shift o the W, NW, or N.",
+        123 => "Clearing, cooler and windy.",
+        124 => "Partly cloudy with little temperature change.",
+        125 => "Mostly clear with little temperature change.",
+        126 => "Mostly cloudy with little temperature change. Precipitation possible within 12 hours. Windy.",
+        127 => "Partly cloudy with little temperature change.",
+        128 => "Mostly clear with little temperature change.",
+        129 => "Increasing clouds and cooler. Precipitation possible within 12 hours, possibly heavy at times. Windy.",
+        130 => "Mostly cloudy and cooler. Precipitation ending within 6 hours. Windy.",
+        131 => "Partly cloudy with little temperature change.",
+        132 => "Mostly clear with little temperature change.",
+        133 => "Mostly cloudy and cooler. Precipitation possible within 12 hours. Windy.",
+        134 => "Mostly cloudy and cooler. Precipitation ending in 12 to 24 hours.",
+        135 => "Mostly cloudy and cooler.",
+        136 => "Mostly cloudy and cooler. Precipitation continuing, possible heavy at times. Windy.",
+        137 => "Partly cloudy with little temperature change.",
+        138 => "Mostly clear with little temperature change.",
+        139 => "Mostly cloudy and cooler. Precipitation possible within 6 to 12 hours. Windy.",
+        140 => "Mostly cloudy with little temperature change. Precipitation continuing, possibly heavy at times. Windy.",
+        141 => "Partly cloudy with little temperature change.",
+        142 => "Mostly clear with little temperature change.",
+        143 => "Mostly cloudy with little temperature change. Precipitation possible within 6 to 12 hours. Windy.",
+        144 => "Partly cloudy with little temperature change.",
+        145 => "Mostly clear with little temperature change.",
+        146 => "Increasing clouds with little temperature change. Precipitation possible within 12 hours, possibly heavy at times. Windy.",
+        147 => "Mostly cloudy and cooler. Windy.",
+        148 => "Mostly cloudy and cooler. Precipitation continuing, possibly heavy at times. Windy.",
+        149 => "Partly cloudy with little temperature change.",
+        150 => "Mostly clear with little temperature change.",
+        151 => "Mostly cloudy and cooler. Precipitation likely, possibly heavy at times. Windy.",
+        152 => "Mostly cloudy with little temperature change. Precipitation continuing, possibly heavy at times. Windy.",
+        153 => "Mostly cloudy with little temperature change. Precipitation likely, possibly heavy at times. Windy.",
+        154 => "Partly cloudy with little temperature change.",
+        155 => "Mostly clear with little temperature change.",
+        156 => "Increasing clouds and cooler. Precipitation possible within 6 hours. Windy.",
+        157 => "Increasing clouds with little temperature change. Precipitation possible within 6 hours. Windy",
+        158 => "Increasing clouds and cooler. Precipitation continuing. Windy with possible wind shift to the W, NW, or N.",
+        159 => "Partly cloudy with little temperature change.",
+        160 => "Mostly clear with little temperature change.",
+        161 => "Mostly cloudy and cooler. Precipitation likely. Windy with possible wind shift to the W, NW, or N.",
+        162 => "Mostly cloudy with little temperature change. Precipitation continuing. Windy with possible wind shift to the W, NW, or N.",
+        163 => "Mostly cloudy with little temperature change. Precipitation likely. Windy with possible wind shift to the W, NW, or N.",
+        164 => "Increasing clouds and cooler. Precipitation possible within 6 hours. Windy with possible wind shift to the W, NW, or N.",
+        165 => "Partly cloudy with little temperature change.",
+        166 => "Mostly clear with little temperature change.",
+        167 => "Increasing clouds and cooler. Precipitation possible within 6 hours possible wind shift to the W, NW, or N.",
+        168 => "Increasing clouds with little temperature change. Precipitation possible within 6 hours. Windy with possible wind shift to the W, NW, or N.",
+        169 => "Increasing clouds with little temperature change. Precipitation possible within 6 hours possible wind shift to the W, NW, or N.",
+        170 => "Partly cloudy with little temperature change.",
+        171 => "Mostly clear with little temperature change.",
+        172 => "Increasing clouds and cooler. Precipitation possible within 6 hours. Windy with possible wind shift to the W, NW, or N.",
+        173 => "Increasing clouds with little temperature change. Precipitation possible within 6 hours. Windy with possible wind shift to the W, NW, or N.",
+        174 => "Partly cloudy with little temperature change.",
+        175 => "Mostly clear with little temperature change.",
+        176 => "Increasing clouds and cooler. Precipitation possible within 12 to 24 hours. Windy with possible wind shift to the W, NW, or N.",
+        177 => "Increasing clouds with little temperature change. Precipitation possible within 12 to 24 hours. Windy with possible wind shift to the W, NW, or N.",
+        178 => "Mostly cloudy and cooler. Precipitation possibly heavy at times and ending within 12 hours. Windy with possible wind shift to the W, NW, or N.",
+        179 => "Partly cloudy with little temperature change.",
+        180 => "Mostly clear with little temperature change.",
+        181 => "Mostly cloudy and cooler. Precipitation possible within 6 to 12 hours, possibly heavy at times. Windy with possible wind shift to the W, NW, or N.",
+        182 => "Mostly cloudy with little temperature change. Precipitation ending within 12 hours. Windy with possible wind shift to the W, NW, or N.",
+        183 => "Mostly cloudy with little temperature change. Precipitation possible within 6 to 12 hours, possibly heavy at times. Windy with possible wind shift to the W, NW, or N.",
+        184 => "Mostly cloudy and cooler. Precipitation continuing.",
+        185 => "Partly cloudy with little temperature change.",
+        186 => "Mostly clear with little temperature change.",
+        187 => "Mostly cloudy and cooler. Precipitation likely. Windy with possible wind shift to the W, NW, or N.",
+        188 => "Mostly cloudy with little temperature change. Precipitation continuing.",
+        189 => "Mostly cloudy with little temperature change. Precipitation likely.",
+        190 => "Partly cloudy with little temperature change.",
+        191 => "Mostly clear with little temperature change.",
+        192 => "Mostly cloudy and cooler. Precipitation possible within 12 hours, possibly heavy at times. Windy.",
+        193 => "FORECAST REQUIRES 3 HOURS OF RECENT DATA",
+        194 => "Mostly clear and cooler.",
+        195 => "Mostly clear and cooler.",
+        196 => "Mostly clear and cooler.",
+        );
+
+
+    /**
+     * VantagePro constructor.
+     * @param $ip string Vantage Pro/Vantage Vue WeatherLink IP address
+     * @param $port int Vantage Pro/Vantage Vue WeatherLink port. Default: 22222
+     */
+    function __construct($ip, $port) {
 		$this->OPTIONS["ip"]=$ip;
 		$this->OPTIONS["port"]=$port;
 		}
 
-	function SetOption($key,$value) {
+    /**
+     * Sets class options
+     * @param $key string Option key
+     * @param $value string Option value
+     */
+    function SetOption($key, $value) {
 		$this->OPTIONS[$key]=$value;
 		}
 
-	function GetLastErrorMessage() {
+    /**
+     * @return string Last error message
+     */
+    function GetLastErrorMessage() {
 		return $this->ErrorMessage;
 		}
 
-	function GetWarningMessages() {
+    /**
+     * @return array Last warning message
+     */
+    function GetWarningMessages() {
 		return $this->WarningMessage;
 		}
 
-	function GetData() {
+    /**
+     * @return array Returns all fetched and converted data
+     */
+    function GetData() {
 		return $this->DATA;
 		}
 
 
-	function SetCallback($callback,$packet_type) {
+    /**
+     * Sets callback functions for packet receiving.
+     * @param $callback string Function name
+     * @param $packet_type "LOOP" or "LOOP2"
+     * @return bool Return true, if callback function successfully set
+     */
+    function SetCallback($callback, $packet_type) {
 		if ($packet_type=="LOOP" && is_callable($callback)) {$this->CalbackLOOP=$callback;return true;}
 		if ($packet_type=="LOOP2" && is_callable($callback)) {$this->CalbackLOOP2=$callback;return true;}
 		return false;
 		}
 
-	function temperatureRound($temp) {
+    /**
+     * @param $temp int Temperature round function.
+     * @return string Rounded value
+     */
+    function temperatureRound($temp) {
 		return sprintf("%.3f", $temp);
 		}
 
 
-	function ConvertLOOPData($ret) {
+    /**
+     * Converts LOOP packed data to metric system.
+     * @param $ret array Associative array received from weather station with Vantage Pro2 and the US imperial values
+     * @return mixed Associative array with metric values
+     */
+    function ConvertLOOPData($ret) {
 		// Current Barometer. Units are (in Hg / 1000). The barometric
 		// value should be between 20 inches and 32.5 inches in Vantage
 		// Pro and between 20 inches and 32.5 inches in both Vantatge Pro
 		// Vantage Pro2. Values outside these ranges will not be logged.
 
-		$ret["Barometer"]=(($ret["Barometer"]*25.399999705)/1000)/0.75; // Результат в Паскалях
+		$ret["Barometer"]=(($ret["Barometer"]*25.399999705)/1000)/0.75; // Result in Pa (Pascal)
 		switch ($ret["BarTrend"]) {
 			case 196: $ret["BarTrend"]="--";break;
 			case 236: $ret["BarTrend"]="-";break;
 			case 20: $ret["BarTrend"]="+";break;
 			case 60: $ret["BarTrend"]="++";break;
-			case 0: $ret["BarTrend"]="~";
+			case 0: $ret["BarTrend"]="~";break;
 			default: $ret["BarTrend"]=null;
 			}
 
 		// The value is sent as 10th of a degree in F. For example, 795 is
 		// returned for 79.5°F.
 
-		$ret["InsideTemperature"]=$this->temperatureRound((($ret["InsideTemperature"]/10)-32)/1.8); // Результат в градусах цельсия
-		$ret["OutsideTemperature"]=$this->temperatureRound((($ret["OutsideTemperature"]/10)-32)/1.8); // Результат в градусах цельсия
+		$ret["InsideTemperature"]=$this->temperatureRound((($ret["InsideTemperature"]/10)-32)/1.8); // Сelsius degrees
+		$ret["OutsideTemperature"]=$this->temperatureRound((($ret["OutsideTemperature"]/10)-32)/1.8); // Сelsius degrees
 
 		// This is the relative humidity in %, such as 50 is returned for 50%
-		$ret["InsideHumidity"]=$ret["InsideHumidity"]; // Ну хоть что-то в нормальных еденицах
 
 		// It is a byte unsigned value in mph. If the wind speed is dashed
 		// because it lost synchronization with the radio or due to some
 		// other reason, the wind speed is forced to be 0.
 		if ($ret["WindSpeed"]==255) $ret["WindSpeed"]=null;
-		else $ret["WindSpeed"]=$ret["WindSpeed"] * 0.44704; // Результат в м/с
+		else $ret["WindSpeed"]=$ret["WindSpeed"] * 0.44704; // m/s
 
 		if ($ret["WindSpeed10MinutesAvg"]==255) $ret["WindSpeed10MinutesAvg"]=null;
-		else $ret["WindSpeed10MinutesAvg"]=$ret["WindSpeed10MinutesAvg"] * 0.44704; // Результат в м/с
+		else $ret["WindSpeed10MinutesAvg"]=$ret["WindSpeed10MinutesAvg"] * 0.44704; // m/s
 
 		// It is a two byte unsigned value from 1 to 360 degrees. (0° is no
 		// wind data, 90° is East, 180° is South, 270° is West and 360° is
@@ -134,23 +368,23 @@ class VantagePro {
 
 		// This value is sent as number of rain clicks (0.2mm or 0.01in).
 		// For example, 256 can represent 2.56 inches/hour.
-		$ret["RainRate"]=0.2*$ret["RainRate"]; // Результат в мм
+		$ret["RainRate"]=0.2*$ret["RainRate"]; // mm
 
 		// The storm is stored as 100th of an inch
-		$ret["StormRain"]=($ret["StormRain"]/100)/0.0394; // Результат в мм
+		$ret["StormRain"]=($ret["StormRain"]/100)/0.0394; // mm
 
-		$ret["DayRain"]=0.2*$ret["DayRain"]; // Результат в мм
-		$ret["MonthRain"]=0.2*$ret["MonthRain"]; // Результат в мм
-		$ret["YearRain"]=0.2*$ret["YearRain"]; // Результат в мм
+		$ret["DayRain"]=0.2*$ret["DayRain"]; // mm
+		$ret["MonthRain"]=0.2*$ret["MonthRain"]; // mm
+		$ret["YearRain"]=0.2*$ret["YearRain"]; // ,,
 
 		// Bit 15 to bit 12 is the month, bit 11 to bit 7 is the day and bit 6 to
 		// bit 0 is the year offseted by 2000.
 
 		$ret["StartDateofcurrentStorm"]=(($ret["StartDateofcurrentStorm"]&0x3F)+2000)."-".sprintf("%02d", (($ret["StartDateofcurrentStorm"]>>12)&0x1F) )."-".sprintf("%02d", ((($ret["StartDateofcurrentStorm"]>>7)&0x0F)) );
 
-		$ret["DayET"]=($ret["DayET"]/1000)/0.0394; // Результат в мм 0.3
-		$ret["MonthET"]=($ret["MonthET"]/100)/0.0394; // Результат в мм  7.4
-		$ret["YearET"]=($ret["YearET"]/100)/0.0394; // Результат в мм
+		$ret["DayET"]=($ret["DayET"]/1000)/0.0394; // mm
+		$ret["MonthET"]=($ret["MonthET"]/100)/0.0394; // mm
+		$ret["YearET"]=($ret["YearET"]/100)/0.0394; // mm
 
 		$ret["TimeofSunrise"]=substr($ret["TimeofSunrise"],0,2).":".substr($ret["TimeofSunrise"],2,2);
 		$ret["TimeofSunset"]=substr($ret["TimeofSunset"],0,2).":".substr($ret["TimeofSunset"],2,2);
@@ -158,41 +392,47 @@ class VantagePro {
 		// Voltage = ((Data * 300)/512)/100.0
 		$ret["ConsoleBatteryVoltage"]=(($ret["ConsoleBatteryVoltage"] * 300)/512)/100;
 
+		$ret["Forecast"]=$this->FORECAST12[$ret["ForecastRulenumber"]];
+
 		return $ret;
 		}
 
-	function ConvertLOOP2Data($ret) {
+    /**
+     * Converts LOOP2 packed data to metric system.
+     * @param $ret array Associative array received from weather station with Vantage Pro2 and the US imperial values
+     * @return mixed Associative array with metric values
+     */
+    function ConvertLOOP2Data($ret) {
 		// Current Barometer. Units are (in Hg / 1000). The barometric
 		// value should be between 20 inches and 32.5 inches in Vantage
 		// Pro and between 20 inches and 32.5 inches in both Vantatge Pro
 		// Vantage Pro2. Values outside these ranges will not be logged.
 
-		$ret["Barometer"]=(($ret["Barometer"]*25.399999705)/1000)/0.75; // Результат в Паскалях
+		$ret["Barometer"]=(($ret["Barometer"]*25.399999705)/1000)/0.75; // Pa (Pascal)
 		switch ($ret["BarTrend"]) {
 			case 196: $ret["BarTrend"]="++";break;
 			case 236: $ret["BarTrend"]="+";break;
 			case 20: $ret["BarTrend"]="-";break;
 			case 60: $ret["BarTrend"]="--";break;
-			case 0: $ret["BarTrend"]="~";
+			case 0: $ret["BarTrend"]="~";break;
 			default: $ret["BarTrend"]=null;
 			}
 
 		// The value is sent as 10th of a degree in F. For example, 795 is
 		// returned for 79.5°F.
 
-		$ret["InsideTemperature"]=$this->temperatureRound( (($ret["InsideTemperature"]/10)-32)/1.8 ); // Результат в градусах цельсия
-		$ret["OutsideTemperature"]=$this->temperatureRound( (($ret["OutsideTemperature"]/10)-32)/1.8 ); // Результат в градусах цельсия
+		$ret["InsideTemperature"]=$this->temperatureRound( (($ret["InsideTemperature"]/10)-32)/1.8 ); // Сelsius degrees
+		$ret["OutsideTemperature"]=$this->temperatureRound( (($ret["OutsideTemperature"]/10)-32)/1.8 ); // Сelsius degrees
     
 		// This is the relative humidity in %, such as 50 is returned for 50%
-		$ret["InsideHumidity"]=$ret["InsideHumidity"]; // Ну хоть что-то в нормальных еденицах
-    
+
 		// It is a byte unsigned value in mph. If the wind speed is dashed
 		// because it lost synchronization with the radio or due to some
 		// other reason, the wind speed is forced to be 0.
 		$ret["WindSpeed"]=$ret["WindSpeed"] * 0.44704; // Результат в м/с
-		$ret["WindSpeed10MinutesAvg"]=$ret["WindSpeed10MinutesAvg"] * 0.044704; // Результат в м/с
-		$ret["WindSpeed2MinutesAvg"]=$ret["WindSpeed2MinutesAvg"] * 0.044704; // Результат в м/с
-		$ret["WindGust10MinutesAvg"]=$ret["WindGust10MinutesAvg"] * 0.44704; // Результат в м/с
+		$ret["WindSpeed10MinutesAvg"]=$ret["WindSpeed10MinutesAvg"] * 0.044704; // m/s
+		$ret["WindSpeed2MinutesAvg"]=$ret["WindSpeed2MinutesAvg"] * 0.044704; // m/s
+		$ret["WindGust10MinutesAvg"]=$ret["WindGust10MinutesAvg"] * 0.44704; // m/s
     
 		// It is a two byte unsigned value from 1 to 360 degrees. (0° is no
 		// wind data, 90° is East, 180° is South, 270° is West and 360° is
@@ -202,47 +442,52 @@ class VantagePro {
     
 		// The value is a signed two byte value in whole degrees F.
 		// 255 = dashed data
-		if ($ret["DewPoint"]!=255) $ret["DewPoint"]=$this->temperatureRound(($ret["DewPoint"]-32)/1.8); else $ret["DewPoint"]=null; // Результат в градусах цельсия
+		if ($ret["DewPoint"]!=255) $ret["DewPoint"]=$this->temperatureRound(($ret["DewPoint"]-32)/1.8); else $ret["DewPoint"]=null; // Сelsius degrees
 
 		// The value is a signed two byte value in whole degrees F.
 		// 255 = dashed data
-		if ($ret["HeatIndex"]==255) $ret["HeatIndex"]=null; else $ret["HeatIndex"]=$this->temperatureRound(($ret["HeatIndex"]-32)/1.8);
+		if ($ret["HeatIndex"]==255) $ret["HeatIndex"]=null; else $ret["HeatIndex"]=$this->temperatureRound(($ret["HeatIndex"]-32)/1.8); // Сelsius degrees
 
 		// The value is a signed two byte value in whole degrees F.
 		// 255 = dashed data
-		if ($ret["WindChill"]==255) $ret["WindChill"]=null; else $ret["WindChill"]=$this->temperatureRound(($ret["WindChill"]-32)/1.8);
+		if ($ret["WindChill"]==255) $ret["WindChill"]=null; else $ret["WindChill"]=$this->temperatureRound(($ret["WindChill"]-32)/1.8); // Сelsius degrees
 
 		// The value is a signed two byte value in whole degrees F.
 		// 255 = dashed data
-		if ($ret["THSWIndex"]==255) $ret["THSWIndex"]=null; else $ret["THSWIndex"]=$this->temperatureRound(($ret["THSWIndex"]-32)/1.8);
+		if ($ret["THSWIndex"]==255) $ret["THSWIndex"]=null; else $ret["THSWIndex"]=$this->temperatureRound(($ret["THSWIndex"]-32)/1.8); // Сelsius degrees
     
 		// This value is sent as number of rain clicks (0.2mm or 0.01in).
 		// For example, 256 can represent 2.56 inches/hour.
-		$ret["RainRate"]=0.2*$ret["RainRate"]; // Результат в мм
+		$ret["RainRate"]=0.2*$ret["RainRate"]; // mm
     
 		// The storm is stored as 100th of an inch
-		$ret["StormRain"]=($ret["StormRain"]/100)/0.0394; // Результат в мм
+		$ret["StormRain"]=($ret["StormRain"]/100)/0.0394; // mm
     
-		$ret["DailyRain"]=0.2*$ret["DailyRain"]; // Результат в мм
-		$ret["Last15minRain"]=0.2*$ret["Last15minRain"]; // Результат в мм
-		$ret["Last24HourRain"]=0.2*$ret["Last24HourRain"]; // Результат в мм
+		$ret["DailyRain"]=0.2*$ret["DailyRain"]; // mm
+		$ret["Last15minRain"]=0.2*$ret["Last15minRain"]; // mm
+		$ret["Last24HourRain"]=0.2*$ret["Last24HourRain"]; // mm
     
 		// Bit 15 to bit 12 is the month, bit 11 to bit 7 is the day and bit 6 to
 		// bit 0 is the year offseted by 2000.
     
 		$ret["StartDateofcurrentStorm"]=(($ret["StartDateofcurrentStorm"]&0x3F)+2000)."-".sprintf("%02d", (($ret["StartDateofcurrentStorm"]>>12)&0x1F) )."-".sprintf("%02d", ((($ret["StartDateofcurrentStorm"]>>7)&0x0F)) );
     
-		$ret["DailyET"]=($ret["DailyET"]/1000)/0.0394; // Результат в мм 0.3
+		$ret["DailyET"]=($ret["DailyET"]/1000)/0.0394; // mm
     
-		if ($ret["UserEnteredBarometricOffset"]!=-1) $ret["UserEnteredBarometricOffset"]=($ret["UserEnteredBarometricOffset"]/1000)/0.0394; // Результат в мм 0.3
-		if ($ret["BarometricCalibrationNumber"]!=-1) $ret["BarometricCalibrationNumber"]=($ret["BarometricCalibrationNumber"]/1000)/0.0394; // Результат в мм 0.3
-		if ($ret["AbsoluteBarometricPressure"]!=-1) $ret["AbsoluteBarometricPressure"]=($ret["AbsoluteBarometricPressure"]/1000)/0.0394; // Результат в мм 0.3
-		if ($ret["AltimeterSetting"]!=-1) $ret["AltimeterSetting"]=($ret["AltimeterSetting"]/1000)/0.0394; // Результат в мм 0.3
+		if ($ret["UserEnteredBarometricOffset"]!=-1) $ret["UserEnteredBarometricOffset"]=($ret["UserEnteredBarometricOffset"]/1000)/0.0394; // mm
+		if ($ret["BarometricCalibrationNumber"]!=-1) $ret["BarometricCalibrationNumber"]=($ret["BarometricCalibrationNumber"]/1000)/0.0394; // mm
+		if ($ret["AbsoluteBarometricPressure"]!=-1) $ret["AbsoluteBarometricPressure"]=($ret["AbsoluteBarometricPressure"]/1000)/0.0394; // mm
+		if ($ret["AltimeterSetting"]!=-1) $ret["AltimeterSetting"]=($ret["AltimeterSetting"]/1000)/0.0394; // mm
 
 		return $ret;
 		}
 
-	function CheckCRC($packet) {
+    /**
+     * Checks binary LOOP and LOOP2 packet CRC
+     * @param $packet string Binary LOOP or LOOP2 packet
+     * @return bool true, if test passed
+     */
+    function CheckCRC($packet) {
 		$crc=0;
 		for ($i=0;$i<strlen($packet);$i++) {
 			$crc = ( $this->crc_table [ ($crc >> 8) ^ ord($packet[$i]) ] ^ (($crc << 8) & 0xFFFF) ) & 0xFFFF;
@@ -250,7 +495,12 @@ class VantagePro {
 		if ($crc === 0) return true; else return false;
 		}
 
-	function GetPacketType($packet) {
+    /**
+     * Returns type of binary packet
+     * @param $packet string First 6 bytes of binary LOOP or LOOP2 packet
+     * @return string Type of packet. LOOP or LOOP2
+     */
+    function GetPacketType($packet) {
 
 		$str ="Ch1/Ch2/Ch3/CBarTrend/CPacketType";
 		$ret = unpack($str, $packet);
@@ -260,7 +510,12 @@ class VantagePro {
 		return "UNKNOWN";
 		}
 
-	function PacketLOOPToData($p) {
+    /**
+     * Unpacks binary LOOP packet to associative array
+     * @param $p string Binary LOOP packet
+     * @return array|bool Associative array, or false if error causes
+     */
+    function PacketLOOPToData($p) {
 
 		if (strlen($p)!=99) return false;
 		if (!$this->CheckCRC($p)) return false;
@@ -282,6 +537,11 @@ class VantagePro {
 		return $ret;
 		}
 
+    /**
+     * Unpacks binary LOOP2 packet to associative array
+     * @param $p string Binary LOOP2 packet
+     * @return array|bool Associative array, or false if error causes
+     */
 	function PacketLOOP2ToData($p) {
 		$str ="Ch1/Ch2/Ch3/CBarTrend/CPacketType/vUnused1/";
 		$str.="vBarometer/vInsideTemperature/CInsideHumidity/vOutsideTemperature/CWindSpeed/CUnused2/vWindDirection/";
@@ -295,7 +555,12 @@ class VantagePro {
 		return $ret;
 		}
 
-	function SaveData($packet_type,$data) {
+    /**
+     * Save fetched data
+     * @param $packet_type string Packet type, LOOP or LOOP2
+     * @param $data array Associative array with LOOP or LOOP2 data
+     */
+    function SaveData($packet_type, $data) {
 		$d=array(
 			"datetime"=>date("Y-m-d H:i:s"),
 			"packet_type"=>$packet_type,
@@ -305,7 +570,12 @@ class VantagePro {
 		$this->DATA[]=$d;
 		}
 
-	function FetchData($packets_count) {
+    /**
+     * Fetch data from Vantage Pro/Vue weatherlink
+     * @param $packets_count int Number of packet to be fetched
+     * @return bool true, if all packets was successfully received, false otherwise. Error message can be retrieved by GetLastErrorMessage() method
+     */
+    function FetchData($packets_count) {
 
 		$attemps=0;
 		do {
@@ -372,7 +642,7 @@ class VantagePro {
 				$length=strlen($out);
 
 				if ($length!=0) {
-					if ($length>=6) $pt=$this->GetPacketType($out);
+					if ($length>=6) $pt=$this->GetPacketType($out); else $pt="";
     
 					switch ($pt) {
 						case "LOOP":
