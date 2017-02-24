@@ -7,8 +7,10 @@ class VantagePro {
 	private $ErrorMessage="";
 	private $WarningMessage=array();
 
-	private $CalbackLOOP="";
-	private $CalbackLOOP2="";
+	private $CallbackLOOP="";
+	private $CallbackLOOP2="";
+	private $CallbackLOOPReceived="";
+	private $CallbackLOOP2Received="";
 
 	private $crc_table= array(
 		 0x0, 0x1021, 0x2042, 0x3063, 0x4084, 0x50a5, 0x60c6, 0x70e7,
@@ -290,12 +292,14 @@ class VantagePro {
     /**
      * Sets callback functions for packet receiving.
      * @param $callback string Function name
-     * @param $packet_type "LOOP" or "LOOP2"
+     * @param $packet_type "LOOP" or "LOOP2" for converted data callback / "LOOPReceived" and "LOOP2Received" for unconverted data callback
      * @return bool Return true, if callback function successfully set
      */
     function SetCallback($callback, $packet_type) {
-		if ($packet_type=="LOOP" && is_callable($callback)) {$this->CalbackLOOP=$callback;return true;}
-		if ($packet_type=="LOOP2" && is_callable($callback)) {$this->CalbackLOOP2=$callback;return true;}
+		if ($packet_type=="LOOP" && is_callable($callback)) {$this->CallbackLOOP=$callback;return true;}
+		if ($packet_type=="LOOP2" && is_callable($callback)) {$this->CallbackLOOP2=$callback;return true;}
+		if ($packet_type=="LOOPReceived" && is_callable($callback)) {$this->CallbackLOOPReceived=$callback;return true;}
+		if ($packet_type=="LOOP2Received" && is_callable($callback)) {$this->CallbackLOOP2Received=$callback;return true;}
 		return false;
 		}
 
@@ -308,25 +312,12 @@ class VantagePro {
 		}
 
 
-<<<<<<< HEAD
-	function ConvertLOOPData($ret) {
-
-
-$fw=fopen(dirname(__FILE__)."/LOOP.txt","a");
-if ($fw) {
-	fwrite($fw,date("Y-m-d H:i:s")."\t".json_encode($ret)."\n");
-	fclose($fw);
-	}
-
-
-=======
     /**
      * Converts LOOP packed data to metric system.
      * @param $ret array Associative array received from weather station with Vantage Pro2 and the US imperial values
      * @return mixed Associative array with metric values
      */
     function ConvertLOOPData($ret) {
->>>>>>> origin/master
 		// Current Barometer. Units are (in Hg / 1000). The barometric
 		// value should be between 20 inches and 32.5 inches in Vantage
 		// Pro and between 20 inches and 32.5 inches in both Vantatge Pro
@@ -345,8 +336,8 @@ if ($fw) {
 		// The value is sent as 10th of a degree in F. For example, 795 is
 		// returned for 79.5°F.
 
-		$ret["InsideTemperature"]=$this->temperatureRound((($ret["InsideTemperature"]/10)-32)/1.8); // Ñelsius degrees
-		$ret["OutsideTemperature"]=$this->temperatureRound((($ret["OutsideTemperature"]/10)-32)/1.8); // Ñelsius degrees
+		$ret["InsideTemperature"]=$this->temperatureRound((($ret["InsideTemperature"]/10)-32)/1.8); // Celsius degrees
+		$ret["OutsideTemperature"]=$this->temperatureRound((($ret["OutsideTemperature"]/10)-32)/1.8); // Celsius degrees
 
 		// This is the relative humidity in %, such as 50 is returned for 50%
 
@@ -354,17 +345,10 @@ if ($fw) {
 		// because it lost synchronization with the radio or due to some
 		// other reason, the wind speed is forced to be 0.
 		if ($ret["WindSpeed"]==255) $ret["WindSpeed"]=null;
-<<<<<<< HEAD
-		else $ret["WindSpeed"]=$this->temperatureRound($ret["WindSpeed"] * 0.44704); // Ðåçóëüòàò â ì/ñ
-
-		if ($ret["WindSpeed10MinutesAvg"]==255) $ret["WindSpeed10MinutesAvg"]=null;
-		else $ret["WindSpeed10MinutesAvg"]=$this->temperatureRound($ret["WindSpeed10MinutesAvg"] * 0.44704); // Ðåçóëüòàò â ì/ñ
-=======
 		else $ret["WindSpeed"]=$ret["WindSpeed"] * 0.44704; // m/s
 
 		if ($ret["WindSpeed10MinutesAvg"]==255) $ret["WindSpeed10MinutesAvg"]=null;
 		else $ret["WindSpeed10MinutesAvg"]=$ret["WindSpeed10MinutesAvg"] * 0.44704; // m/s
->>>>>>> origin/master
 
 		// It is a two byte unsigned value from 1 to 360 degrees. (0° is no
 		// wind data, 90° is East, 180° is South, 270° is West and 360° is
@@ -402,17 +386,11 @@ if ($fw) {
 		if ($ret["StartDateofcurrentStorm"]==65535) $ret["StartDateofcurrentStorm"]=null;
 		else $ret["StartDateofcurrentStorm"]=(($ret["StartDateofcurrentStorm"]&0x3F)+2000)."-".sprintf("%02d", (($ret["StartDateofcurrentStorm"]>>12)&0x1F) )."-".sprintf("%02d", ((($ret["StartDateofcurrentStorm"]>>7)&0x0F)) );
 
-		$ret["DayET"]=$this->temperatureRound(($ret["DayET"]/1000)/0.0394); // Ðåçóëüòàò â ìì 0.3
-		$ret["MonthET"]=$this->temperatureRound(($ret["MonthET"]/100)/0.0394); // Ðåçóëüòàò â ìì  7.4
-		$ret["YearET"]=$this->temperatureRound(($ret["YearET"]/100)/0.0394); // Ðåçóëüòàò â ìì
+		$ret["DayET"]=$this->temperatureRound(($ret["DayET"]/1000)/0.0394); // mm
+		$ret["MonthET"]=$this->temperatureRound(($ret["MonthET"]/100)/0.0394); // mm
+		$ret["YearET"]=$this->temperatureRound(($ret["YearET"]/100)/0.0394); // mm
 
-<<<<<<< HEAD
 		if ($ret["SolarRadiation"]<0 || $ret["SolarRadiation"]==65535) $ret["SolarRadiation"]=null;
-=======
-		$ret["DayET"]=($ret["DayET"]/1000)/0.0394; // mm
-		$ret["MonthET"]=($ret["MonthET"]/100)/0.0394; // mm
-		$ret["YearET"]=($ret["YearET"]/100)/0.0394; // mm
->>>>>>> origin/master
 
 		$ret["TimeofSunrise"]=substr($ret["TimeofSunrise"],0,2).":".substr($ret["TimeofSunrise"],2,2);
 		$ret["TimeofSunset"]=substr($ret["TimeofSunset"],0,2).":".substr($ret["TimeofSunset"],2,2);
@@ -428,24 +406,12 @@ if ($fw) {
 		return $ret;
 		}
 
-<<<<<<< HEAD
-	function ConvertLOOP2Data($ret) {
-
-$fw=fopen(dirname(__FILE__)."/LOOP2.txt","a");
-if ($fw) {
-	fwrite($fw,date("Y-m-d H:i:s")."\t".json_encode($ret)."\n");
-	fclose($fw);
-	}
-
-
-=======
     /**
      * Converts LOOP2 packed data to metric system.
      * @param $ret array Associative array received from weather station with Vantage Pro2 and the US imperial values
      * @return mixed Associative array with metric values
      */
     function ConvertLOOP2Data($ret) {
->>>>>>> origin/master
 		// Current Barometer. Units are (in Hg / 1000). The barometric
 		// value should be between 20 inches and 32.5 inches in Vantage
 		// Pro and between 20 inches and 32.5 inches in both Vantatge Pro
@@ -464,15 +430,15 @@ if ($fw) {
 		// The value is sent as 10th of a degree in F. For example, 795 is
 		// returned for 79.5°F.
 
-		$ret["InsideTemperature"]=$this->temperatureRound( (($ret["InsideTemperature"]/10)-32)/1.8 ); // Ñelsius degrees
-		$ret["OutsideTemperature"]=$this->temperatureRound( (($ret["OutsideTemperature"]/10)-32)/1.8 ); // Ñelsius degrees
+		$ret["InsideTemperature"]=$this->temperatureRound( (($ret["InsideTemperature"]/10)-32)/1.8 ); // Celsius degrees
+		$ret["OutsideTemperature"]=$this->temperatureRound( (($ret["OutsideTemperature"]/10)-32)/1.8 ); // Celsius degrees
     
 		// This is the relative humidity in %, such as 50 is returned for 50%
 
 		// It is a byte unsigned value in mph. If the wind speed is dashed
 		// because it lost synchronization with the radio or due to some
 		// other reason, the wind speed is forced to be 0.
-		$ret["WindSpeed"]=$ret["WindSpeed"] * 0.44704; // Ðåçóëüòàò â ì/ñ
+		$ret["WindSpeed"]=$ret["WindSpeed"] * 0.44704; // m/s
 		$ret["WindSpeed10MinutesAvg"]=$ret["WindSpeed10MinutesAvg"] * 0.044704; // m/s
 		$ret["WindSpeed2MinutesAvg"]=$ret["WindSpeed2MinutesAvg"] * 0.044704; // m/s
 		$ret["WindGust10MinutesAvg"]=$ret["WindGust10MinutesAvg"] * 0.44704; // m/s
@@ -485,19 +451,19 @@ if ($fw) {
     
 		// The value is a signed two byte value in whole degrees F.
 		// 255 = dashed data
-		if ($ret["DewPoint"]!=255) $ret["DewPoint"]=$this->temperatureRound(($ret["DewPoint"]-32)/1.8); else $ret["DewPoint"]=null; // Ñelsius degrees
+		if ($ret["DewPoint"]!=255) $ret["DewPoint"]=$this->temperatureRound(($ret["DewPoint"]-32)/1.8); else $ret["DewPoint"]=null; // Celsius degrees
 
 		// The value is a signed two byte value in whole degrees F.
 		// 255 = dashed data
-		if ($ret["HeatIndex"]==255) $ret["HeatIndex"]=null; else $ret["HeatIndex"]=$this->temperatureRound(($ret["HeatIndex"]-32)/1.8); // Ñelsius degrees
+		if ($ret["HeatIndex"]==255) $ret["HeatIndex"]=null; else $ret["HeatIndex"]=$this->temperatureRound(($ret["HeatIndex"]-32)/1.8); // Celsius degrees
 
 		// The value is a signed two byte value in whole degrees F.
 		// 255 = dashed data
-		if ($ret["WindChill"]==255) $ret["WindChill"]=null; else $ret["WindChill"]=$this->temperatureRound(($ret["WindChill"]-32)/1.8); // Ñelsius degrees
+		if ($ret["WindChill"]==255) $ret["WindChill"]=null; else $ret["WindChill"]=$this->temperatureRound(($ret["WindChill"]-32)/1.8); // Celsius degrees
 
 		// The value is a signed two byte value in whole degrees F.
 		// 255 = dashed data
-		if ($ret["THSWIndex"]==255) $ret["THSWIndex"]=null; else $ret["THSWIndex"]=$this->temperatureRound(($ret["THSWIndex"]-32)/1.8); // Ñelsius degrees
+		if ($ret["THSWIndex"]==255) $ret["THSWIndex"]=null; else $ret["THSWIndex"]=$this->temperatureRound(($ret["THSWIndex"]-32)/1.8); // Celsius degrees
     
 		// This value is sent as number of rain clicks (0.2mm or 0.01in).
 		// For example, 256 can represent 2.56 inches/hour.
@@ -516,14 +482,11 @@ if ($fw) {
 		if ($ret["StartDateofcurrentStorm"]==65535) $ret["StartDateofcurrentStorm"]=null;
 		else $ret["StartDateofcurrentStorm"]=(($ret["StartDateofcurrentStorm"]&0x3F)+2000)."-".sprintf("%02d", (($ret["StartDateofcurrentStorm"]>>12)&0x1F) )."-".sprintf("%02d", ((($ret["StartDateofcurrentStorm"]>>7)&0x0F)) );
     
-<<<<<<< HEAD
-		$ret["DailyET"]=($ret["DailyET"]/1000)/0.0394; // Ðåçóëüòàò â ìì 0.3
+
+		$ret["DailyET"]=($ret["DailyET"]/1000)/0.0394; // mm
 
 		if ($ret["SolarRadiation"]<0 || $ret["SolarRadiation"]==65535) $ret["SolarRadiation"]=null;
-=======
-		$ret["DailyET"]=($ret["DailyET"]/1000)/0.0394; // mm
->>>>>>> origin/master
-    
+
 		if ($ret["UserEnteredBarometricOffset"]!=-1) $ret["UserEnteredBarometricOffset"]=($ret["UserEnteredBarometricOffset"]/1000)/0.0394; // mm
 		if ($ret["BarometricCalibrationNumber"]!=-1) $ret["BarometricCalibrationNumber"]=($ret["BarometricCalibrationNumber"]/1000)/0.0394; // mm
 		if ($ret["AbsoluteBarometricPressure"]!=-1) $ret["AbsoluteBarometricPressure"]=($ret["AbsoluteBarometricPressure"]/1000)/0.0394; // mm
@@ -706,9 +669,10 @@ if ($fw) {
 								}
 							$d=$this->PacketLOOPToData(substr($out,0,99));
 							if ($d) {
+								if (!empty($this->CallbackLOOPReceived) && is_callable($this->CallbackLOOPReceived)) call_user_func($this->CallbackLOOPReceived,$d);
 								$d=$this->ConvertLOOPData($d);
 								$this->SaveData("LOOP",$d);
-								if (!empty($this->CalbackLOOP) && is_callable($this->CalbackLOOP)) call_user_func($this->CalbackLOOP,$d);
+								if (!empty($this->CallbackLOOP) && is_callable($this->CallbackLOOP)) call_user_func($this->CallbackLOOP,$d);
 								}
 							else $this->WarningMessage[]="CRC error at LOOP packet.";
 							$out=substr($out,99);
@@ -722,9 +686,10 @@ if ($fw) {
 								}
 							$d=$this->PacketLOOP2ToData(substr($out,0,99));
 							if ($d) {
+								if (!empty($this->CallbackLOOP2Received) && is_callable($this->CallbackLOOP2Received)) call_user_func($this->CallbackLOOP2Received,$d);
 								$d=$this->ConvertLOOP2Data($d);
 								$this->SaveData("LOOP2",$d);
-								if (!empty($this->CalbackLOOP2) && is_callable($this->CalbackLOOP2)) call_user_func($this->CalbackLOOP2,$d);
+								if (!empty($this->CallbackLOOP2) && is_callable($this->CallbackLOOP2)) call_user_func($this->CallbackLOOP2,$d);
 								}
 							else $this->WarningMessage="CRC error at LOOP2 packet.";
 							$out=substr($out,99);
