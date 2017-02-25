@@ -441,7 +441,7 @@ class VantagePro {
 		$ret["WindSpeed"]=$ret["WindSpeed"] * 0.44704; // m/s
 		$ret["WindSpeed10MinutesAvg"]=$ret["WindSpeed10MinutesAvg"] * 0.044704; // m/s
 		$ret["WindSpeed2MinutesAvg"]=$ret["WindSpeed2MinutesAvg"] * 0.044704; // m/s
-		$ret["WindGust10MinutesAvg"]=$ret["WindGust10MinutesAvg"] * 0.44704; // m/s
+		if ($ret["WindGust10MinutesAvg"]==199) $ret["WindGust10MinutesAvg"]=null; else $ret["WindGust10MinutesAvg"]=$ret["WindGust10MinutesAvg"] * 0.44704; // m/s
     
 		// It is a two byte unsigned value from 1 to 360 degrees. (0° is no
 		// wind data, 90° is East, 180° is South, 270° is West and 360° is
