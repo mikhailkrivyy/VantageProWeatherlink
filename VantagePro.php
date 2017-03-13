@@ -336,16 +336,16 @@ class VantagePro {
 		// The value is sent as 10th of a degree in F. For example, 795 is
 		// returned for 79.5°F.
 
-		$ret["InsideTemperature"]=$this->temperatureRound((($ret["InsideTemperature"]/10)-32)/1.8); // Celsius degrees
-		$ret["OutsideTemperature"]=$this->temperatureRound((($ret["OutsideTemperature"]/10)-32)/1.8); // Celsius degrees
+		if ($ret["InsideTemperature"]==32767) $ret["InsideTemperature"]=null; else $ret["InsideTemperature"]=$this->temperatureRound((($ret["InsideTemperature"]/10)-32)/1.8); // Celsius degrees
+		if ($ret["OutsideTemperature"]==32767) $ret["OutsideTemperature"]=null; else $ret["OutsideTemperature"]=$this->temperatureRound((($ret["OutsideTemperature"]/10)-32)/1.8); // Celsius degrees
 
 		// This is the relative humidity in %, such as 50 is returned for 50%
+		if ($ret["OutsideHumidity"]==255) $ret["OutsideHumidity"]=null;
 
 		// It is a byte unsigned value in mph. If the wind speed is dashed
 		// because it lost synchronization with the radio or due to some
 		// other reason, the wind speed is forced to be 0.
-		if ($ret["WindSpeed"]==255) $ret["WindSpeed"]=null;
-		else $ret["WindSpeed"]=$ret["WindSpeed"] * 0.44704; // m/s
+		if ($ret["WindSpeed"]==255) $ret["WindSpeed"]=null;	else $ret["WindSpeed"]=$ret["WindSpeed"] * 0.44704; // m/s
 
 		if ($ret["WindSpeed10MinutesAvg"]==255) $ret["WindSpeed10MinutesAvg"]=null;
 		else $ret["WindSpeed10MinutesAvg"]=$ret["WindSpeed10MinutesAvg"] * 0.44704; // m/s
@@ -353,7 +353,7 @@ class VantagePro {
 		// It is a two byte unsigned value from 1 to 360 degrees. (0° is no
 		// wind data, 90° is East, 180° is South, 270° is West and 360° is
 		// north)
-		if ($ret["WindDirection"]==0) $ret["WindDirection"]=null;
+		if ($ret["WindDirection"]==0 || $ret["WindDirection"]==32767) $ret["WindDirection"]=null;
 
 		// This field supports seven extra temperature stations.
 		// Each byte is one extra temperature value in whole degrees F with
@@ -372,7 +372,7 @@ class VantagePro {
 
 		// This value is sent as number of rain clicks (0.2mm or 0.01in).
 		// For example, 256 can represent 2.56 inches/hour.
-		$ret["RainRate"]=0.2*$ret["RainRate"]; // mm
+		if ($ret["RainRate"]==65535) $ret["RainRate"]=null; else $ret["RainRate"]=0.2*$ret["RainRate"]; // mm
 
 		// The storm is stored as 100th of an inch
 		$ret["StormRain"]=($ret["StormRain"]/100)/0.0394; // mm
@@ -390,18 +390,27 @@ class VantagePro {
 		$ret["MonthET"]=$this->temperatureRound(($ret["MonthET"]/100)/0.0394); // mm
 		$ret["YearET"]=$this->temperatureRound(($ret["YearET"]/100)/0.0394); // mm
 
-		if ($ret["SolarRadiation"]<0 || $ret["SolarRadiation"]==65535) $ret["SolarRadiation"]=null;
+		if ($ret["SolarRadiation"]<0 || $ret["SolarRadiation"]==65535 || $ret["SolarRadiation"]==32767) $ret["SolarRadiation"]=null;
 
 		$ret["TimeofSunrise"]=substr($ret["TimeofSunrise"],0,2).":".substr($ret["TimeofSunrise"],2,2);
 		$ret["TimeofSunset"]=substr($ret["TimeofSunset"],0,2).":".substr($ret["TimeofSunset"],2,2);
 
 		// Undocumented ?
-		$ret["UV"]=$ret["UV"]/10;
+		if ($ret["UV"]==255) $ret["UV"]=null; else $ret["UV"]=$ret["UV"]/10;
 
 		// Voltage = ((Data * 300)/512)/100.0
 		$ret["ConsoleBatteryVoltage"]=(($ret["ConsoleBatteryVoltage"] * 300)/512)/100;
 
 		$ret["Forecast"]=$this->FORECAST12[$ret["ForecastRulenumber"]];
+
+		for ($i=1;$i<=7;$i++) {
+			if ($ret["ExtraTemp".$i]==255) $ret["ExtraTemp".$i]=null; else $ret["ExtraTemp".$i]=$this->temperatureRound((($ret["ExtraTemp".$i]/10)-32)/1.8);
+			if ($ret["ExtraHumidity".$i]==255) $ret["ExtraHumidity".$i]=null; else $ret["ExtraHumidity".$i]=$this->temperatureRound((($ret["ExtraHumidity".$i]/10)-32)/1.8);
+			}
+		for ($i=1;$i<=4;$i++) {
+			if ($ret["SoilTemp".$i]==255) $ret["SoilTemp".$i]=null; else $ret["SoilTemp".$i]=$this->temperatureRound((($ret["SoilTemp".$i]/10)-32)/1.8);
+			if ($ret["LeafTemp".$i]==255) $ret["LeafTemp".$i]=null; else $ret["LeafTemp".$i]=$this->temperatureRound((($ret["LeafTemp".$i]/10)-32)/1.8);
+			}
 
 		return $ret;
 		}
@@ -430,24 +439,25 @@ class VantagePro {
 		// The value is sent as 10th of a degree in F. For example, 795 is
 		// returned for 79.5°F.
 
-		$ret["InsideTemperature"]=$this->temperatureRound( (($ret["InsideTemperature"]/10)-32)/1.8 ); // Celsius degrees
-		$ret["OutsideTemperature"]=$this->temperatureRound( (($ret["OutsideTemperature"]/10)-32)/1.8 ); // Celsius degrees
-    
+		if ($ret["InsideTemperature"]==32767) $ret["InsideTemperature"]=null; else $ret["InsideTemperature"]=$this->temperatureRound( (($ret["InsideTemperature"]/10)-32)/1.8 ); // Celsius degrees
+		if ($ret["OutsideTemperature"]==32767) $ret["OutsideTemperature"]=null; else $ret["OutsideTemperature"]=$this->temperatureRound( (($ret["OutsideTemperature"]/10)-32)/1.8 ); // Celsius degrees
+
 		// This is the relative humidity in %, such as 50 is returned for 50%
+		if ($ret["OutsideHumidity"]==255) $ret["OutsideHumidity"]=null;
 
 		// It is a byte unsigned value in mph. If the wind speed is dashed
 		// because it lost synchronization with the radio or due to some
 		// other reason, the wind speed is forced to be 0.
-		$ret["WindSpeed"]=$ret["WindSpeed"] * 0.44704; // m/s
-		$ret["WindSpeed10MinutesAvg"]=$ret["WindSpeed10MinutesAvg"] * 0.044704; // m/s
-		$ret["WindSpeed2MinutesAvg"]=$ret["WindSpeed2MinutesAvg"] * 0.044704; // m/s
-		if ($ret["WindGust10MinutesAvg"]==199) $ret["WindGust10MinutesAvg"]=null; else $ret["WindGust10MinutesAvg"]=$ret["WindGust10MinutesAvg"] * 0.44704; // m/s
+		if ($ret["WindSpeed"]==255) $ret["WindSpeed"]=null; else $ret["WindSpeed"]=$ret["WindSpeed"] * 0.44704; // m/s
+		if ($ret["WindSpeed10MinutesAvg"]==32767) $ret["WindSpeed10MinutesAvg"]=null; else $ret["WindSpeed10MinutesAvg"]=$ret["WindSpeed10MinutesAvg"] * 0.044704; // m/s
+		if ($ret["WindSpeed2MinutesAvg"]==32767) $ret["WindSpeed2MinutesAvg"]=null; else $ret["WindSpeed2MinutesAvg"]=$ret["WindSpeed2MinutesAvg"] * 0.044704; // m/s
+		if ($ret["WindGust10MinutesAvg"]==199 || $ret["WindGust10MinutesAvg"]==255) $ret["WindGust10MinutesAvg"]=null; else $ret["WindGust10MinutesAvg"]=$ret["WindGust10MinutesAvg"] * 0.44704; // m/s
     
 		// It is a two byte unsigned value from 1 to 360 degrees. (0° is no
 		// wind data, 90° is East, 180° is South, 270° is West and 360° is
 		// north)
-		if ($ret["WindDirection"]==0) $ret["WindDirection"]=null;
-		if ($ret["WindGust10MinutesDirectionAvg"]==0) $ret["WindGust10MinutesDirectionAvg"]=null;
+		if ($ret["WindDirection"]==0 || $ret["WindDirection"]==32767) $ret["WindDirection"]=null;
+		if ($ret["WindGust10MinutesDirectionAvg"]==0 || $ret["WindGust10MinutesDirectionAvg"]==65535) $ret["WindGust10MinutesDirectionAvg"]=null;
     
 		// The value is a signed two byte value in whole degrees F.
 		// 255 = dashed data
@@ -464,10 +474,10 @@ class VantagePro {
 		// The value is a signed two byte value in whole degrees F.
 		// 255 = dashed data
 		if ($ret["THSWIndex"]==255) $ret["THSWIndex"]=null; else $ret["THSWIndex"]=$this->temperatureRound(($ret["THSWIndex"]-32)/1.8); // Celsius degrees
-    
+
 		// This value is sent as number of rain clicks (0.2mm or 0.01in).
 		// For example, 256 can represent 2.56 inches/hour.
-		$ret["RainRate"]=0.2*$ret["RainRate"]; // mm
+		if ($ret["RainRate"]==65536) $ret["RainRate"]=null; else $ret["RainRate"]=0.2*$ret["RainRate"]; // mm
     
 		// The storm is stored as 100th of an inch
 		$ret["StormRain"]=($ret["StormRain"]/100)/0.0394; // mm
@@ -485,7 +495,7 @@ class VantagePro {
 
 		$ret["DailyET"]=($ret["DailyET"]/1000)/0.0394; // mm
 
-		if ($ret["SolarRadiation"]<0 || $ret["SolarRadiation"]==65535) $ret["SolarRadiation"]=null;
+		if ($ret["SolarRadiation"]<0 || $ret["SolarRadiation"]==65535 || $ret["SolarRadiation"]==32767) $ret["SolarRadiation"]=null;
 
 		if ($ret["UserEnteredBarometricOffset"]!=-1) $ret["UserEnteredBarometricOffset"]=($ret["UserEnteredBarometricOffset"]/1000)/0.0394; // mm
 		if ($ret["BarometricCalibrationNumber"]!=-1) $ret["BarometricCalibrationNumber"]=($ret["BarometricCalibrationNumber"]/1000)/0.0394; // mm
@@ -493,7 +503,7 @@ class VantagePro {
 		if ($ret["AltimeterSetting"]!=-1) $ret["AltimeterSetting"]=($ret["AltimeterSetting"]/1000)/0.0394; // mm
 
 		// Undocumented ?
-		$ret["UV"]=$ret["UV"]/10;
+		if ($ret["UV"]==-1) $ret["UV"]=null; else $ret["UV"]=$ret["UV"]/10;
 
 		return $ret;
 		}
